@@ -16,15 +16,16 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     //Private
-    private val BASE_URL = "https://staging.run.app.scuti.store/?gameId=6db28ef4-69b0-421a-9344-31318f898790"
-
+    //private val BASE_URL = "https://staging.run.app.scuti.store/?gameId=6db28ef4-69b0-421a-9344-31318f898790&platform=Unity"
+    private val BASE_URL = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
+    private var initialized = false;
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         //Webview
-        val webView  = findViewById<WebView>(R.id.webView)
+        /*val webView  = findViewById<WebView>(R.id.webView)
         webView.webChromeClient = object : WebChromeClient(){
             fun onPageFinished(view: WebView, url: String) {
                 Log.d("INFO", "<******* Page Loaded *******>");
@@ -35,24 +36,56 @@ class MainActivity : AppCompatActivity() {
             override fun onPageFinished(view: WebView, url: String) {
                 Log.d("INFO", "<******0 Page Loaded 0******> "+url);
 
-                //val bridgeMessage = WebMessage("function sendMessage(msg) {\n" +
-                //        "console.log('testing code inject');\n" +
-                //        "var valueReceived =  msg;\n" +
-                //        "JSBridge.showMessageInNative(valueReceived);\n" +
-                //        "console.log(valueReceived);\n" +
-                //        "}");
-                //webView.postWebMessage(bridgeMessage, Uri.parse(url));
-                webView.evaluateJavascript("function sendMessage(msg) {\n" +
-                        "console.log('testing code inject');\n" +
-                        "var valueReceived =  msg;\n" +
-                        "JSBridge.showMessageInNative(valueReceived);\n" +
-                        "}", onJsEvalCallback());
+                if (url.startsWith("unity:")) {
+                    val message = url.substring(6);
+                    Log.d("INFO", "<******0 unity: 0******> "+message);
 
-                //val testMessage = WebMessage("sendMessage('this a test string');");
-                //webView.postWebMessage(testMessage, Uri.parse(url));
-                webView.evaluateJavascript("sendMessage('this a test string');", onJsEvalCallback());
+                } else {
 
-                if (Looper.getMainLooper().isCurrentThread) {
+                    webView.evaluateJavascript(
+                        "if (window && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {\n" +
+                                "     console.log(' ==> IF ---> ');\n" +
+                                "     window.Unity = {\n" +
+                                "         call: function(msg) {\n" +
+                                "             console.log('call1: '+msg);\n" +
+                                "             window.webkit.messageHandlers.unityControl.postMessage(msg);\n" +
+                                "         }\n" +
+                                "     }\n" +
+                                " } else {\n" +
+                                "     console.log(' ==> ELSE ---> '+window.webkit);\n" +
+                                "     window.Unity = {\n" +
+                                "         call: function(msg) {\n" +
+                                "             console.log('call2: '+msg);\n" +
+                                "             JSBridge.showMessageInNative(msg);//window.location = 'unity:' + msg;\n" +
+                                "         }\n" +
+                                "     }\n" +
+                                " }", null
+                    );
+
+                    //val bridgeMessage = WebMessage("function sendMessage(msg) {\n" +
+                    //        "console.log('testing code inject');\n" +
+                    //        "var valueReceived =  msg;\n" +
+                    //        "JSBridge.showMessageInNative(valueReceived);\n" +
+                    //        "console.log(valueReceived);\n" +
+                    //        "}");
+                    //webView.postWebMessage(bridgeMessage, Uri.parse(url));
+                    webView.evaluateJavascript(
+                        "function sendMessage(msg) {\n" +
+                                "console.log('testing code inject');\n" +
+                                "var valueReceived =  msg;\n" +
+                                "JSBridge.showMessageInNative(valueReceived);\n" +
+                                "}", onJsEvalCallback()
+                    );
+
+                    //val testMessage = WebMessage("sendMessage('this a test string');");
+                    //webView.postWebMessage(testMessage, Uri.parse(url));
+                    webView.evaluateJavascript(
+                        "sendMessage('this a test string');",
+                        onJsEvalCallback()
+                    );
+
+
+                    /*if (Looper.getMainLooper().isCurrentThread) {
                     Log.d("INFO", "<8===- On UI thread -===8> ");
                     // On UI thread.
                 } else {
@@ -65,22 +98,22 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     // Not on UI thread.
                     Log.d("INFO", "<8--===- NOT On UI thread -===--8> ");
-                }
+                }*/
 
-                //val getNewProductsMessage = WebMessage("getNewProducts();");
-                //webView.postWebMessage(getNewProductsMessage, Uri.parse(url));
-                //val getNewRewardsMessage = WebMessage("getNewRewards();");
-                //webView.postWebMessage(getNewRewardsMessage, Uri.parse(url));
-                //webView.evaluateJavascript("getNewProducts();", null);
-                //webView.evaluateJavascript("getNewProducts();", null);
-                Log.d("INFO", "<===- 0 starting Delay 0 -===> ");
-                /*Handler().postDelayed({
+                    //val getNewProductsMessage = WebMessage("getNewProducts();");
+                    //webView.postWebMessage(getNewProductsMessage, Uri.parse(url));
+                    //val getNewRewardsMessage = WebMessage("getNewRewards();");
+                    //webView.postWebMessage(getNewRewardsMessage, Uri.parse(url));
+                    //webView.evaluateJavascript("getNewProducts();", null);
+                    //webView.evaluateJavascript("getNewProducts();", null);
+                    Log.d("INFO", "<===- 0 starting Delay 0 -===> ");
+                    /*Handler().postDelayed({
                     Log.d("INFO", "<===- 0 Calling function 0 -===> ");
                     webView.loadUrl("javascript:getNewProducts()");
                 }, 10000)*/
 
-                // try to call method from UI thread
-                this@MainActivity.runOnUiThread(java.lang.Runnable {
+                    // try to call method from UI thread
+                    /*this@MainActivity.runOnUiThread(java.lang.Runnable {
                     if (Looper.getMainLooper().isCurrentThread) {
                         Log.d("INFO", "<===- On UI thread -===> ");
                         // On UI thread.
@@ -99,13 +132,20 @@ class MainActivity : AppCompatActivity() {
                     }
                     //webView.evaluateJavascript("getNewProducts();", null);
                     webView.loadUrl("javascript:getNewProducts()");
-                })
-
-                /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                })*/
+                    Log.d("INFO", "<===- initialized -===> " + initialized);
+                    //if(!initialized)
+                    //{
+                    //initialized = true;
+                    webView.evaluateJavascript("initializeApp();", null);
+                    //}
+                    //webView.loadUrl("javascript:getNewProducts()");
+                    /*if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
                     webView.evaluateJavascript("getNewProducts();", null/*onJsEvalCallback()*/);
                 } else {
                     webView.loadUrl("javascript:getNewProducts();");
                 }*/
+                }
             }
         }
         webView.settings.domStorageEnabled = true;
@@ -126,7 +166,7 @@ class MainActivity : AppCompatActivity() {
         webView.loadUrl(BASE_URL)
 
         //webView.evaluateJavascript(/*Sample*/"", onJsEvalCallback())
-
+*/
     }
 
     /**
@@ -146,11 +186,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        val webView  = findViewById<WebView>(R.id.webView)
+        /*val webView  = findViewById<WebView>(R.id.webView)
         if(webView.canGoBack()){
             webView.goBack()
         }else{
             super.onBackPressed()
-        }
+        }*/
     }
 }
