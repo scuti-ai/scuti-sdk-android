@@ -7,8 +7,6 @@
     tools:context=".MainActivity"
     tools:visibility="visible">
 
-
-
     <!--SearchView
         android:id="@+id/searchView"
         android:layout_width="0dp"
@@ -26,7 +24,7 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"-->
-    <ImageButton
+    <!--ImageButton
         android:id="@+id/scutibtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -107,12 +105,31 @@
         android:src="@drawable/new_items_flag"
         app:layout_constraintBottom_toTopOf="@+id/newitemhguide"
         app:layout_constraintEnd_toStartOf="@+id/newitemvguide"
-        tools:visibility="visible" />
+        tools:visibility="visible" /-->
 <!--/androidx.constraintlayout.widget.ConstraintLayout-->
 
-
-
-
+    <!--ImageButton
+        android:id="@+id/myScutiBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:background="@drawable/roundcorner"
+        android:maxWidth="250dp"
+        android:maxHeight="180dp"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="20dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/scuti_logo_white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" /-->
+    <com.mindtrust.scutinativesdk.ScutiButton
+        android:id="@+id/myScutiBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></com.mindtrust.scutinativesdk.ScutiButton>
 
     <!--ImageView
         android:layout_width="wrap_content"
@@ -141,11 +158,21 @@
         app:layout_constraintTop_toBottomOf="@+id/scutibtn" >
 
     </WebView-->
-    <FrameLayout
+    <com.mindtrust.scutinativesdk.ScutiWebView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/myScutiBtn">
+
+    </com.mindtrust.scutinativesdk.ScutiWebView>
+    <!--FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scutibtn"
         app:layout_constraintBottom_toBottomOf="parent">
     <com.mindtrust.scutinativesdk.ScutiWebView
         android:id="@+id/webView"
@@ -154,6 +181,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/scutibtn"></com.mindtrust.scutinativesdk.ScutiWebView>
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        ></com.mindtrust.scutinativesdk.ScutiWebView>
+    </FrameLayout-->
 </androidx.constraintlayout.widget.ConstraintLayout>

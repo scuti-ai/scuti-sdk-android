@@ -8,9 +8,11 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.webkit.*
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.mindtrust.scutinativesdk.ScutiButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -18,14 +20,26 @@ class MainActivity : AppCompatActivity() {
     //Private
     //private val BASE_URL = "https://staging.run.app.scuti.store/?gameId=6db28ef4-69b0-421a-9344-31318f898790&platform=Unity"
     private val BASE_URL = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
-    private var initialized = false;
+    //private var initialized = false;
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d("INFO", "-*-*-*-*-* INIT *-*-*-*-*-");
 
+        var scutiBtn  = findViewById<ScutiButton>(R.id.myScutiBtn);
+
+        //scutiBtn.showNotificationIcon(false);
+
+        /*var scutiBtn  = findViewById<ImageButton>(R.id.myScutiBtn);
+        scutiB.setOnClickListener{
+            Log.d("INFO", "-*-*-*-*-* CLICKED *-*-*-*-*-");
+            Toast.makeText(applicationContext,"Scuti button clicked!!", Toast.LENGTH_LONG).show()
+        }*/
+
+/*
         //Webview
-        /*val webView  = findViewById<WebView>(R.id.webView)
+        val webView  = findViewById<WebView>(R.id.webView)
         webView.webChromeClient = object : WebChromeClient(){
             fun onPageFinished(view: WebView, url: String) {
                 Log.d("INFO", "<******* Page Loaded *******>");
@@ -133,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                     //webView.evaluateJavascript("getNewProducts();", null);
                     webView.loadUrl("javascript:getNewProducts()");
                 })*/
-                    Log.d("INFO", "<===- initialized -===> " + initialized);
+                    //Log.d("INFO", "<===- initialized -===> " + initialized);
                     //if(!initialized)
                     //{
                     //initialized = true;
@@ -167,30 +181,30 @@ class MainActivity : AppCompatActivity() {
 
         //webView.evaluateJavascript(/*Sample*/"", onJsEvalCallback())
 */
-    }
+}
 
-    /**
-     * Receive message from webview and pass on to native.
-     */
-    class JSBridge(val context: Context){
-        @JavascriptInterface
-        fun showMessageInNative(message:String){
-            Log.d("INFO", "<******0 Message 0******> "+message);
-            Toast.makeText(context,message, Toast.LENGTH_LONG).show()
-        }
-    }
+/**
+* Receive message from webview and pass on to native.
+*/
+class JSBridge(val context: Context){
+@JavascriptInterface
+fun showMessageInNative(message:String){
+    Log.d("INFO", "<******0 Message 0******> "+message);
+    Toast.makeText(context,message, Toast.LENGTH_LONG).show()
+}
+}
 
-    private fun onJsEvalCallback (): ValueCallback<String>? {
-        Log.d("INFO", "<******0 onJsEvalCallback 0******> ");
-        return null
-    }
+private fun onJsEvalCallback (): ValueCallback<String>? {
+Log.d("INFO", "<******0 onJsEvalCallback 0******> ");
+return null
+}
 
-    override fun onBackPressed() {
-        /*val webView  = findViewById<WebView>(R.id.webView)
-        if(webView.canGoBack()){
-            webView.goBack()
-        }else{
-            super.onBackPressed()
-        }*/
-    }
+override fun onBackPressed() {
+/*val webView  = findViewById<WebView>(R.id.webView)
+if(webView.canGoBack()){
+    webView.goBack()
+}else{
+    super.onBackPressed()
+}*/
+}
 }

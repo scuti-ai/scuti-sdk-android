@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebMessage
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -29,13 +30,15 @@ class ScutiWebView @JvmOverloads constructor(
     init{
         LayoutInflater.from(context).inflate(R.layout.scutiwebview, this, true)
 
+        Log.d("INFO", "<----0 Init ScutiWebView 0----> ");
+        //val myTxt  = findViewById<TextView>(R.id.txt)
         //Webview
-        /*val webView  = findViewById<WebView>(R.id.webView)
-        webView.webChromeClient = object : WebChromeClient(){
+        val webView  = findViewById<WebView>(R.id.myWebView)
+        /*webView.webChromeClient = object : WebChromeClient(){
             fun onPageFinished(view: WebView, url: String) {
                 Log.d("INFO", "<******* Page Loaded *******>");
             }
-        }
+        }*/
 
         webView.webViewClient = object : WebViewClient(){
             @RequiresApi(Build.VERSION_CODES.M)
@@ -92,9 +95,9 @@ class ScutiWebView @JvmOverloads constructor(
         //val settings : WebSettings = webView.settings
         //settings.javaScriptEnabled = true
 
-        /*Log.d("INFO", "loadUrl: "+BASE_URL);
-        webView.loadUrl(BASE_URL)*/
-        Log.d("INFO", "loadUrl: "+BASE_URL);*/
+        Log.d("INFO", "loadUrl: "+BASE_URL);
+        webView.loadUrl(BASE_URL)
+        //Log.d("INFO", "loadUrl: "+BASE_URL);
     }
 
     /**
