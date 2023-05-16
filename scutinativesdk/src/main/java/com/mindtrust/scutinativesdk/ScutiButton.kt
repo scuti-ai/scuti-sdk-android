@@ -1,9 +1,11 @@
 package com.mindtrust.scutinativesdk
 
 import android.content.Context
+import android.os.Bundle
 import android.util.AttributeSet
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.ImageButton
@@ -11,39 +13,51 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 
-class ScutiButton @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet,
-    defStyle:Int = 0,
-    defStyleRes:Int = 0
-) : ConstraintLayout(context, attrs, defStyle, defStyleRes) {
+class ScutiButton : Fragment()  {
 
-    private val scutiBtn:ImageButton;
-    private val notification:ViewGroup;
-    private val newItem:ImageView;
+    private var callback: ScutiInterface? = null
+    private lateinit var scutiBtn:ImageButton;
+    private lateinit var notification:ViewGroup;
+    private lateinit var newItem:ImageView;
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.scutibutton, this, true)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
 
-        Log.d("INFO", "<-----<< Button Scuti >>-----> ");
-        scutiBtn  = findViewById<ImageButton>(R.id.scutibtn);
-        notification  = findViewById<ViewGroup>(R.id.notification);
-        newItem  = findViewById<ImageView>(R.id.newitem);
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.scutibutton, container, false)
+
+        if (context is ScutiInterface) {
+            Log.d("INFO", "ScutiInterface::"+context);
+            callback = context as ScutiInterface
+        }
+
+        scutiBtn  = view.findViewById(R.id.scutibtn);
+        notification  = view.findViewById(R.id.notification);
+        newItem  = view.findViewById(R.id.newitem);
 
         scutiBtn.setOnClickListener{
             Log.d("INFO", "<-----<< Button Scuti CLICKED!! >>----->");
-            Toast.makeText(context,"Scuti button clicked!!", Toast.LENGTH_LONG).show()
+            //Toast.makeText(context,"Scuti button clicked!!", Toast.LENGTH_LONG).show()
+            callback?.onScutiButtonClicked()
+
         }
+        callback?.onButtonLoadCompleted()
+        return view;
     }
 
-    public fun showNewItemImage(show:Boolean)
+    fun showNewItemImage(show:Boolean)
     {
+        Log.d("INFO", "<-----<< showNewItemImage >>-----> "+show);
         newItem.isVisible = show
     }
 
-    public fun showNotificationIcon(show:Boolean)
+    fun showNotificationIcon(show:Boolean)
     {
+        Log.d("INFO", "<-----<< showNotificationIcon >>-----> "+show);
         notification.isVisible = show
     }
 }

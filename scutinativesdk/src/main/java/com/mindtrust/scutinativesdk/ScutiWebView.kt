@@ -1,44 +1,57 @@
 package com.mindtrust.scutinativesdk
 
 import android.content.Context
-import android.net.Uri
 import android.os.Build
-import android.util.AttributeSet
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.webkit.JavascriptInterface
-import android.webkit.WebChromeClient
-import android.webkit.WebMessage
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 
-class ScutiWebView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet,
-    defStyle:Int = 0,
-    defStyleRes:Int = 0
-) : ConstraintLayout(context, attrs, defStyle, defStyleRes) {
 
+interface ScutiInterface {
+    fun onWebViewLoadCompleted()
+    fun onButtonLoadCompleted()
+    fun onScutiButtonClicked()
+}
+
+
+class ScutiWebView : Fragment()  {
+
+    private var callback: ScutiInterface? = null
     //Private
     //private val BASE_URL = "https://staging.run.app.scuti.store/?gameId=6db28ef4-69b0-421a-9344-31318f898790"
-    private val BASE_URL = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
+    private var base_url = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
+    private lateinit var webView:WebView
 
-    init{
-        LayoutInflater.from(context).inflate(R.layout.scutiwebview, this, true)
+    override fun onAttachFragment(childFragment: Fragment) {
+        super.onAttachFragment(childFragment)
 
-        Log.d("INFO", "<----0 Init ScutiWebView 0----> ");
-        //val myTxt  = findViewById<TextView>(R.id.txt)
-        //Webview
-        val webView  = findViewById<WebView>(R.id.myWebView)
-        /*webView.webChromeClient = object : WebChromeClient(){
-            fun onPageFinished(view: WebView, url: String) {
-                Log.d("INFO", "<******* Page Loaded *******>");
-            }
-        }*/
+
+    }
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.scutiwebview, container, false)
+
+        webView  = view.findViewById(R.id.myWebView)
+
+        Log.d("INFO", "<*****<<--0 onCreateView 0-->>*****>");
+        Log.d("INFO", "context::"+context);
+
+        if (context is ScutiInterface) {
+            Log.d("INFO", "ScutiInterface::"+context);
+            callback = context as ScutiInterface
+        }
 
         webView.webViewClient = object : WebViewClient(){
             @RequiresApi(Build.VERSION_CODES.M)
@@ -89,15 +102,21 @@ class ScutiWebView @JvmOverloads constructor(
 
         webView.settings.javaScriptEnabled = true
 
-        webView.addJavascriptInterface(JSBridge(context),"JSBridge");
+        webView.addJavascriptInterface(JSBridge(requireContext()),"JSBridge");
 
-        Log.d("INFO", "onCreate MainActivity");
-        //val settings : WebSettings = webView.settings
-        //settings.javaScriptEnabled = true
+        Log.d("INFO", "onCreate ScutiWebView callback::"+callback);
 
-        Log.d("INFO", "loadUrl: "+BASE_URL);
-        webView.loadUrl(BASE_URL)
-        //Log.d("INFO", "loadUrl: "+BASE_URL);
+        callback?.onWebViewLoadCompleted()
+
+        return view;
+    }
+
+    fun load(baseurl:String=""){
+        if(baseurl != "") base_url = baseurl
+        Log.d("INFO", "<----0 LOAD ScutiWebView 0----> ");
+
+        Log.d("INFO", "loadUrl: "+base_url);
+        webView.loadUrl(base_url)
     }
 
     /**

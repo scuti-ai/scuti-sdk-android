@@ -123,13 +123,13 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" /-->
-    <com.mindtrust.scutinativesdk.ScutiButton
+    <!--com.mindtrust.scutinativesdk.ScutiButton
         android:id="@+id/myScutiBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"></com.mindtrust.scutinativesdk.ScutiButton>
+        app:layout_constraintTop_toTopOf="parent"></com.mindtrust.scutinativesdk.ScutiButton-->
 
     <!--ImageView
         android:layout_width="wrap_content"
@@ -158,7 +158,7 @@
         app:layout_constraintTop_toBottomOf="@+id/scutibtn" >
 
     </WebView-->
-    <com.mindtrust.scutinativesdk.ScutiWebView
+    <!--com.mindtrust.scutinativesdk.ScutiWebView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -166,7 +166,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/myScutiBtn">
 
-    </com.mindtrust.scutinativesdk.ScutiWebView>
+    </com.mindtrust.scutinativesdk.ScutiWebView-->
+    <FrameLayout
+        android:id="@+id/fragment_scutibtn"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"></FrameLayout>
+    <FrameLayout
+        android:id="@+id/fragment_webview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"></FrameLayout>
     <!--FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
