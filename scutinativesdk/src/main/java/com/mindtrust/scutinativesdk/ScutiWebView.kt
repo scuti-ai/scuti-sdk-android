@@ -21,6 +21,12 @@ interface ScutiInterface {
     fun onScutiButtonClicked()
 }
 
+enum class TargetEnvironment(val type: String) {
+    DEVELOPMENT("https://dev.run.app.scuti.store/"),
+    STAGING("https://staging.run.app.scuti.store/"),
+    PRODUCTION("https://store.scutishopping.com/"),
+}
+
 
 class ScutiWebView : Fragment()  {
 
@@ -30,11 +36,9 @@ class ScutiWebView : Fragment()  {
     private var base_url = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
     private lateinit var webView:WebView
 
-    override fun onAttachFragment(childFragment: Fragment) {
-        super.onAttachFragment(childFragment)
+    private lateinit var targetEnvironment:TargetEnvironment;
+    private lateinit var appId:String;
 
-
-    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -111,8 +115,15 @@ class ScutiWebView : Fragment()  {
         return view;
     }
 
-    fun load(baseurl:String=""){
-        if(baseurl != "") base_url = baseurl
+    fun  init(environment:TargetEnvironment, id:String) {
+        targetEnvironment = environment;
+        appId = id;
+
+        base_url = targetEnvironment.type+"?gameId="+appId+"&platform=Unity"
+
+    }
+
+    fun load(){
         Log.d("INFO", "<----0 LOAD ScutiWebView 0----> ");
 
         Log.d("INFO", "loadUrl: "+base_url);

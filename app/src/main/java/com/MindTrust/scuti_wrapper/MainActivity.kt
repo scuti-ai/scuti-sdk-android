@@ -15,13 +15,14 @@ import androidx.fragment.app.FragmentTransaction
 import com.mindtrust.scutinativesdk.ScutiButton
 import com.mindtrust.scutinativesdk.ScutiInterface
 import com.mindtrust.scutinativesdk.ScutiWebView
+import com.mindtrust.scutinativesdk.TargetEnvironment
 
 
 class MainActivity : AppCompatActivity(), ScutiInterface {
 
     //Private
     //private val BASE_URL = "https://staging.run.app.scuti.store/?gameId=6db28ef4-69b0-421a-9344-31318f898790&platform=Unity"
-    private val BASE_URL = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
+    //private val BASE_URL = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
     private lateinit var webViewLayout: FrameLayout
 
     private lateinit var manager: FragmentManager
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity(), ScutiInterface {
         transaction.replace(R.id.fragment_webview, scutiWebView)
         transaction.commit()
 
+        scutiWebView.init(TargetEnvironment.DEVELOPMENT, "1e6e003f-0b94-4671-bc35-ccc1b48ce87d")
+
     }
 
     private fun onJsEvalCallback (): ValueCallback<String>? {
@@ -67,7 +70,7 @@ class MainActivity : AppCompatActivity(), ScutiInterface {
 
     override fun onWebViewLoadCompleted() {
         Log.d("INFO", "*-*-*-*-*-*-* OOOO*1*OOOO *-*-*-*-*-*-*");
-        scutiWebView.load(BASE_URL)
+        scutiWebView.load()
     }
 
     override fun onButtonLoadCompleted() {
