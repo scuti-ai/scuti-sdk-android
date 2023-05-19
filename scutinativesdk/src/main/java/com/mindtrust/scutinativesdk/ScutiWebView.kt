@@ -13,20 +13,7 @@ import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-
-
-interface ScutiInterface {
-    fun onWebViewLoadCompleted()
-    fun onButtonLoadCompleted()
-    fun onScutiButtonClicked()
-}
-
-enum class TargetEnvironment(val type: String) {
-    DEVELOPMENT("https://dev.run.app.scuti.store/"),
-    STAGING("https://staging.run.app.scuti.store/"),
-    PRODUCTION("https://store.scutishopping.com/"),
-}
-
+import org.json.JSONObject
 
 class ScutiWebView : Fragment()  {
 
@@ -88,6 +75,8 @@ class ScutiWebView : Fragment()  {
                                 " }", null
                     );
                     webView.evaluateJavascript("initializeApp();", null);
+                    getNewProducts()
+                    getNewRewards()
 
                 }
                 /*val getNewProductsMessage = WebMessage("getNewProducts();");
@@ -112,6 +101,8 @@ class ScutiWebView : Fragment()  {
 
         callback?.onWebViewLoadCompleted()
 
+
+
         return view;
     }
 
@@ -130,14 +121,37 @@ class ScutiWebView : Fragment()  {
         webView.loadUrl(base_url)
     }
 
+    fun getNewProducts() {
+        Log.d("INFO", "<----0 getNewProducts() 0----> ");
+        webView.evaluateJavascript("getNewProducts();", null)
+    }
+
+    fun getNewRewards() {
+        Log.d("INFO", "<----0 getNewRewards() 0----> ");
+        webView.evaluateJavascript("getNewRewards();", null)
+    }
+
     /**
      * Receive message from webview and pass on to native.
      */
     class JSBridge(val context: Context){
         @JavascriptInterface
         fun showMessageInNative(message:String){
-            Log.d("INFO", "<******0 Message 0******> "+message);
+            Log.d("INFO", "<******0== Message ==0******> "+message);
+            val callback = context as ScutiInterface
+            val answer = JSONObject(message)
+            Log.d("INFO", "<******0== Message Value ==0******> "+answer.get("message"));
             Toast.makeText(context,message, Toast.LENGTH_LONG).show()
+            when(answer.get("message") as String){
+                ScutiStoreMessages.MSG_BACK_TO_THE_GAME.type -> callback?.onBackToTheGame()
+                ScutiStoreMessages.MSG_SCUTI_EXCHANGE.type -> println(message)
+                ScutiStoreMessages.MSG_NEW_REWARDS.type -> callback?.onNewRewards(answer.get("payload") as Int > 0)
+                ScutiStoreMessages.MSG_NEW_PRODUCTS.type -> callback?.onNewProducts(answer.get("payload") as Int > 0)
+                ScutiStoreMessages.MSG_USER_TOKEN.type -> println(message)
+                ScutiStoreMessages.MSG_STORE_IS_READY.type -> callback?.onStoreIsReady()
+                ScutiStoreMessages.MSG_LOG_OUT.type -> println(message)
+                else -> println(message)
+            }
         }
     }
 }

@@ -1,13 +1,11 @@
 package com.MindTrust.scuti_wrapper
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.webkit.*
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentManager
@@ -82,5 +80,22 @@ class MainActivity : AppCompatActivity(), ScutiInterface {
     override fun onScutiButtonClicked() {
         Log.d("INFO", "*-*-*-*-*-*-* OOOO*3*OOOO *-*-*-*-*-*-*");
         webViewLayout.visibility = View.VISIBLE
+    }
+
+    override fun onBackToTheGame() {
+        Log.d("INFO", "*-*-*-*-*-*-* OOOO*4*OOOO *-*-*-*-*-*-*");
+        runOnUiThread { webViewLayout.visibility = View.GONE }
+    }
+
+    override fun onNewProducts(show: Boolean) {
+        runOnUiThread { scutiButton.showNewItemImage(show) }
+    }
+
+    override fun onNewRewards(show: Boolean) {
+        runOnUiThread { scutiButton.showNotificationIcon(show) }
+    }
+
+    override fun onStoreIsReady() {
+        //TODO("Not yet implemented")
     }
 }
