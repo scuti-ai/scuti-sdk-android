@@ -74,7 +74,7 @@ class ScutiWebView : Fragment()  {
                                 "     }\n" +
                                 " }", null
                     );
-                    webView.evaluateJavascript("initializeApp();", null);
+                    //webView.evaluateJavascript("initializeApp();", null);
                     getNewProducts()
                     getNewRewards()
 
@@ -94,14 +94,13 @@ class ScutiWebView : Fragment()  {
         //webView.settings.databaseEnabled = true;
 
         webView.settings.javaScriptEnabled = true
+        //webView.settings.useWideViewPort = true
 
-        webView.addJavascriptInterface(JSBridge(requireContext()),"JSBridge");
+        webView.addJavascriptInterface(JSBridge(requireContext(), this),"JSBridge");
 
         Log.d("INFO", "onCreate ScutiWebView callback::"+callback);
 
         callback?.onWebViewLoadCompleted()
-
-
 
         return view;
     }
@@ -111,12 +110,24 @@ class ScutiWebView : Fragment()  {
         appId = id;
 
         base_url = targetEnvironment.type+"?gameId="+appId+"&platform=Unity"
-
+        /*val userToken = getToken();
+        Log.d("INFO", "<----0 INIT ScutiWebView 0----> TOKEN:{"+userToken+"}");
+        base_url = if (!userToken.isNullOrBlank()) {
+            targetEnvironment.type+"?gameId="+appId+"&platform=Unity&userToken="+userToken
+        } else {
+            targetEnvironment.type+"?gameId="+appId+"&platform=Unity"
+        }*/
     }
 
     fun load(){
         Log.d("INFO", "<----0 LOAD ScutiWebView 0----> ");
-
+        val userToken = getToken();
+        Log.d("INFO", "<----8 INIT ScutiWebView 8----> TOKEN:{"+userToken+"}");
+        base_url = if (userToken.isNullOrBlank()) {
+            targetEnvironment.type+"?gameId="+appId+"&platform=Unity&userToken="+userToken
+        } else {
+            targetEnvironment.type+"?gameId="+appId+"&platform=Unity"
+        }
         Log.d("INFO", "loadUrl: "+base_url);
         webView.loadUrl(base_url)
     }
@@ -131,10 +142,37 @@ class ScutiWebView : Fragment()  {
         webView.evaluateJavascript("getNewRewards();", null)
     }
 
+    internal fun saveToken(token:String){
+        Log.d("INFO", "<----0 Saving User Token {"+token+"} 0----> ");
+        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        with (sharedPref.edit()) {
+            Log.d("INFO", "   <----0 Saving... {"+token+"} 0----> ");
+            putString(getString(R.string.user_token), token)
+            apply()
+        }
+    }
+
+    internal fun getToken(): String? {
+        Log.d("INFO", "<----0 Getting User Token 0----> ");
+        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return ""
+        Log.d("INFO", "   <----0 Getting... 0----> ");
+        return sharedPref.getString(getString(R.string.user_token), "");
+    }
+
+    internal fun clearToken() {
+        Log.d("INFO", "<----0 Clearing User Token 0----> ");
+        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        Log.d("INFO", "<----0 Clearing... 0----> ");
+        with (sharedPref.edit()) {
+            remove(getString(R.string.user_token))
+            commit()
+        }
+    }
+
     /**
      * Receive message from webview and pass on to native.
      */
-    class JSBridge(val context: Context){
+    class JSBridge(val context: Context, val view:ScutiWebView){
         @JavascriptInterface
         fun showMessageInNative(message:String){
             Log.d("INFO", "<******0== Message ==0******> "+message);
@@ -147,9 +185,9 @@ class ScutiWebView : Fragment()  {
                 ScutiStoreMessages.MSG_SCUTI_EXCHANGE.type -> println(message)
                 ScutiStoreMessages.MSG_NEW_REWARDS.type -> callback?.onNewRewards(answer.get("payload") as Int > 0)
                 ScutiStoreMessages.MSG_NEW_PRODUCTS.type -> callback?.onNewProducts(answer.get("payload") as Int > 0)
-                ScutiStoreMessages.MSG_USER_TOKEN.type -> println(message)
+                ScutiStoreMessages.MSG_USER_TOKEN.type -> view.saveToken(answer.get("payload") as String)
                 ScutiStoreMessages.MSG_STORE_IS_READY.type -> callback?.onStoreIsReady()
-                ScutiStoreMessages.MSG_LOG_OUT.type -> println(message)
+                ScutiStoreMessages.MSG_LOG_OUT.type -> view.clearToken()
                 else -> println(message)
             }
         }

@@ -28,7 +28,6 @@ class MainActivity : AppCompatActivity(), ScutiInterface {
     private lateinit var scutiWebView: ScutiWebView
     private lateinit var transaction: FragmentTransaction
 
-
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +47,7 @@ class MainActivity : AppCompatActivity(), ScutiInterface {
         transaction.replace(R.id.fragment_webview, scutiWebView)
         transaction.commit()
 
-        scutiWebView.init(TargetEnvironment.DEVELOPMENT, "1e6e003f-0b94-4671-bc35-ccc1b48ce87d")
+        scutiWebView.init(TargetEnvironment.PRODUCTION, "6db28ef4-69b0-421a-9344-31318f898790")
 
     }
 
