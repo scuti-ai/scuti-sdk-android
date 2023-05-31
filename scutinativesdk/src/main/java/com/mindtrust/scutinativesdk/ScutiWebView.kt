@@ -143,8 +143,8 @@ class ScutiWebView : Fragment()  {
     }
 
     fun setUserId(userId:String) {
-        Log.d("INFO", "<----0 setGameUserId("+userId+") 0----> ");
-        webView.evaluateJavascript("setGameUserId("+userId+");", null)
+        Log.d("INFO", "<----0 setGameUserId(\""+userId+"\") 0----> ");
+        webView.evaluateJavascript("setGameUserId(\""+userId+"\");", null)
     }
 
     internal fun saveToken(token:String){
