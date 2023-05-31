@@ -94,6 +94,10 @@ class MainActivity : AppCompatActivity(), ScutiInterface {
         runOnUiThread { scutiButton.showNotificationIcon(show) }
     }
 
+    override fun onScutiExchange(earned: String) {
+        //TODO("Not yet implemented")
+    }
+
     override fun onStoreIsReady() {
         //TODO("Not yet implemented")
     }

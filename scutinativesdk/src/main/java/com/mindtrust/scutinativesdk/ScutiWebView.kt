@@ -142,6 +142,11 @@ class ScutiWebView : Fragment()  {
         webView.evaluateJavascript("getNewRewards();", null)
     }
 
+    fun setUserId(userId:String) {
+        Log.d("INFO", "<----0 setGameUserId("+userId+") 0----> ");
+        webView.evaluateJavascript("setGameUserId("+userId+");", null)
+    }
+
     internal fun saveToken(token:String){
         Log.d("INFO", "<----0 Saving User Token {"+token+"} 0----> ");
         val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
@@ -182,7 +187,7 @@ class ScutiWebView : Fragment()  {
             Toast.makeText(context,message, Toast.LENGTH_LONG).show()
             when(answer.get("message") as String){
                 ScutiStoreMessages.MSG_BACK_TO_THE_GAME.type -> callback?.onBackToTheGame()
-                ScutiStoreMessages.MSG_SCUTI_EXCHANGE.type -> println(message)
+                ScutiStoreMessages.MSG_SCUTI_EXCHANGE.type -> callback?.onScutiExchange((answer.get("payload") as Int).toString())
                 ScutiStoreMessages.MSG_NEW_REWARDS.type -> callback?.onNewRewards(answer.get("payload") as Int > 0)
                 ScutiStoreMessages.MSG_NEW_PRODUCTS.type -> callback?.onNewProducts(answer.get("payload") as Int > 0)
                 ScutiStoreMessages.MSG_USER_TOKEN.type -> view.saveToken(answer.get("payload") as String)
