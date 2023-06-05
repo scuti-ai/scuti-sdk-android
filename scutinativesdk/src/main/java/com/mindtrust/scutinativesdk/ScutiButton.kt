@@ -31,7 +31,6 @@ class ScutiButton : Fragment()  {
         val view = inflater.inflate(R.layout.scutibutton, container, false)
 
         if (context is ScutiInterface) {
-            Log.d("INFO", "ScutiInterface::"+context);
             callback = context as ScutiInterface
         }
 
@@ -40,8 +39,6 @@ class ScutiButton : Fragment()  {
         newItem  = view.findViewById(R.id.newitem);
 
         scutiBtn.setOnClickListener{
-            Log.d("INFO", "<-----<< Button Scuti CLICKED!! >>----->");
-            //Toast.makeText(context,"Scuti button clicked!!", Toast.LENGTH_LONG).show()
             callback?.onScutiButtonClicked()
 
         }
@@ -51,13 +48,11 @@ class ScutiButton : Fragment()  {
 
     fun showNewItemImage(show:Boolean)
     {
-        Log.d("INFO", "<-----<< showNewItemImage >>-----> "+show);
         newItem.isVisible = show
     }
 
     fun showNotificationIcon(show:Boolean)
     {
-        Log.d("INFO", "<-----<< showNotificationIcon >>-----> "+show);
         notification.isVisible = show
     }
 }
