@@ -45,8 +45,8 @@ class ScutiWebView : Fragment()  {
             override fun onPageFinished(view: WebView, url: String) {
 
                 if (url.startsWith("unity:")) {
-                    val message = url.substring(6);
-                    Log.d("INFO", " unity: "+message);
+                    //val message = url.substring(6);
+                    //Log.d("INFO", " unity: "+message);
 
                 } else {
 
