@@ -7,7 +7,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.ConsoleMessage
 import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -23,8 +28,12 @@ class ScutiWebView : Fragment()  {
     private var base_url = "https://dev.run.app.scuti.store/?gameId=1e6e003f-0b94-4671-bc35-ccc1b48ce87d&platform=Unity"
     private lateinit var webView:WebView
 
-    private lateinit var targetEnvironment:TargetEnvironment;
-    private lateinit var appId:String;
+    private lateinit var targetEnvironment:TargetEnvironment
+    private lateinit var _logSettings: LogSettings
+    var logSettings: LogSettings = LogSettings.ERROR_ONLY
+        get() = _logSettings
+
+    private lateinit var appId:String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,30 +54,25 @@ class ScutiWebView : Fragment()  {
             override fun onPageFinished(view: WebView, url: String) {
 
                 if (url.startsWith("unity:")) {
-                    //val message = url.substring(6);
-                    //Log.d("INFO", " unity: "+message);
-
+                    val message = url.substring(6);
+                    ScutiLogger.getInstance().log(" unity: $message")
                 } else {
 
                     webView.evaluateJavascript(
                         "if (window && window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.unityControl) {\n" +
-                                "     console.log(' ==> IF ---> ');\n" +
                                 "     window.Unity = {\n" +
                                 "         call: function(msg) {\n" +
-                                "             console.log('call1: '+msg);\n" +
                                 "             window.webkit.messageHandlers.unityControl.postMessage(msg);\n" +
                                 "         }\n" +
                                 "     }\n" +
                                 " } else {\n" +
-                                "     console.log(' ==> ELSE ---> '+window.webkit);\n" +
                                 "     window.Unity = {\n" +
                                 "         call: function(msg) {\n" +
-                                "             console.log('call2: '+msg);\n" +
                                 "             JSBridge.showMessageInNative(msg);//window.location = 'unity:' + msg;\n" +
                                 "         }\n" +
                                 "     }\n" +
                                 " }", null
-                    );
+                    )
                     //webView.evaluateJavascript("initializeApp();", null);
                     getNewProducts()
                     getNewRewards()
@@ -76,28 +80,49 @@ class ScutiWebView : Fragment()  {
                 }
 
             }
+
         }
-        webView.settings.domStorageEnabled = true;
+
+        webView.webChromeClient = object : WebChromeClient() {
+
+            override fun onConsoleMessage(message: ConsoleMessage): Boolean {
+                when(message.messageLevel()){
+                    ConsoleMessage.MessageLevel.ERROR -> ScutiLogger.getInstance().logError("${message.message()} -- From line ${message.lineNumber()} of ${message.sourceId()}")
+                    ConsoleMessage.MessageLevel.LOG -> {
+                        if(message.message().lowercase().contains("error"))
+                            ScutiLogger.getInstance().logError("${message.message()} -- From line ${message.lineNumber()} of ${message.sourceId()}")
+                        else
+                            ScutiLogger.getInstance().log("${message.message()} -- From line ${message.lineNumber()} of ${message.sourceId()}")
+                    }
+                    else -> ScutiLogger.getInstance().log("${message.message()} -- From line ${message.lineNumber()} of ${message.sourceId()}")
+                }
+                return true
+            }
+        }
+
+        webView.settings.domStorageEnabled = true
         //webView.settings.databaseEnabled = true;
 
         webView.settings.javaScriptEnabled = true
         //webView.settings.useWideViewPort = true
 
-        webView.addJavascriptInterface(JSBridge(requireContext(), this),"JSBridge");
+        webView.addJavascriptInterface(JSBridge(requireContext(), this),"JSBridge")
 
         callback?.onWebViewLoadCompleted()
 
-        return view;
+        return view
     }
 
-    fun  init(environment:TargetEnvironment, id:String) {
-        targetEnvironment = environment;
-        appId = id;
+    fun  init(environment:TargetEnvironment, id:String, logSettings: LogSettings) {
+        targetEnvironment = environment
+        _logSettings = logSettings
+        ScutiLogger.getInstance().setLogSettings(_logSettings)
+        appId = id
         base_url = targetEnvironment.type+"?gameId="+appId+"&platform=Unity"
     }
 
     fun load(){
-        val userToken = getToken();
+        val userToken = getToken()
         base_url = if (userToken.isNullOrBlank()) {
             targetEnvironment.type+"?gameId="+appId+"&platform=Unity&userToken="+userToken
         } else {
@@ -115,7 +140,7 @@ class ScutiWebView : Fragment()  {
     }
 
     fun setUserId(userId:String) {
-        webView.evaluateJavascript("setGameUserId(\""+userId+"\");", null)
+        webView.evaluateJavascript("setGameUserId(\"$userId\");", null)
     }
 
     internal fun saveToken(token:String){
@@ -128,7 +153,7 @@ class ScutiWebView : Fragment()  {
 
     internal fun getToken(): String? {
         val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return ""
-        return sharedPref.getString(getString(R.string.user_token), "");
+        return sharedPref.getString(getString(R.string.user_token), "")
     }
 
     internal fun clearToken() {
@@ -147,7 +172,7 @@ class ScutiWebView : Fragment()  {
         fun showMessageInNative(message:String){
             val callback = context as ScutiInterface
             val answer = JSONObject(message)
-            Toast.makeText(context,message, Toast.LENGTH_LONG).show()
+            ScutiLogger.getInstance().log("From HTML: $message")
             when(answer.get("message") as String){
                 ScutiStoreMessages.MSG_BACK_TO_THE_GAME.type -> callback?.onBackToTheGame()
                 ScutiStoreMessages.MSG_SCUTI_EXCHANGE.type -> callback?.onScutiExchange((answer.get("payload") as Int).toString())
@@ -156,7 +181,8 @@ class ScutiWebView : Fragment()  {
                 ScutiStoreMessages.MSG_USER_TOKEN.type -> view.saveToken(answer.get("payload") as String)
                 ScutiStoreMessages.MSG_STORE_IS_READY.type -> callback?.onStoreIsReady()
                 ScutiStoreMessages.MSG_LOG_OUT.type -> view.clearToken()
-                else -> println(message)
+                else -> ScutiLogger.getInstance().log("No Scuti Message: $message")
+
             }
         }
     }
